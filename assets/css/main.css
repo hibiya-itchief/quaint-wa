@@ -38,10 +38,18 @@
   transform: rotate(180deg);
 }
 
-.text-truncate {
-  display: block;
+.text-truncate-clamp-1 {
+  display: block !important;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-truncate-clamp-3 {
+  display: -webkit-box !important;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   text-overflow: ellipsis;
 }
 

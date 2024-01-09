@@ -414,6 +414,9 @@
                 <p class="ma-0 pa-0 text-caption grey--text text--darken-3">
                   顔が写っている写真などはアップロードしないでください
                 </p>
+                <p class="ma-0 pa-0 text-caption grey--text text--darken-3">
+                  画像は縦横比が縦:横=4:3のもの（なるべくそれに近しいもの）を設定してください。サイズが合わず小さく表示されてしまう場合があります。
+                </p>
                 <v-img
                   :src="group?.public_thumbnail_image_url"
                   contain

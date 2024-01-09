@@ -135,12 +135,12 @@
             :key="group.id"
             cols="12"
             sm="6"
-            md="4"
-            lg="3"
+            md="6"
+            lg="4"
             class="my-0 py-2"
           >
             <!-- <class="d-flex flex-column">で，「もっと見る」が常に最下部に -->
-            <GroupCard :group="group" />
+            <GroupCard :group="group" :storageBookmarks="storageBookmarks" />
           </v-col>
         </v-row>
         <p v-show="display_bookmarks" class="mt-10" style="text-align: center">
@@ -165,7 +165,7 @@ type Data = {
   sort_displayname: string
   query_cache: any
   search_result_number: number
-  storage_bookmarks: (string | null)[]
+  storageBookmarks: (string | null)[]
   display_bookmarks: boolean
   selectedTag: Tag | undefined
 }
@@ -190,7 +190,7 @@ export default Vue.extend({
       search_result_number: 0,
       search_query: '',
       sort_displayname: 'デフォルト順',
-      storage_bookmarks: [],
+      storageBookmarks: [],
       display_bookmarks: false,
       query_cache: undefined,
     }
@@ -258,7 +258,9 @@ export default Vue.extend({
   },
   mounted() {
     for (let i = 0; i < localStorage.length; i++) {
-      this.storage_bookmarks.push(localStorage.key(i))
+      if (localStorage.key(i)?.includes('seiryofes.groups.favorite')) {
+        this.storageBookmarks.push(localStorage.key(i))
+      }
     }
 
     // ロードの終了
@@ -380,7 +382,7 @@ export default Vue.extend({
 
     FilterBookmarks(id: string) {
       // お気に入りならtrue
-      return this.storage_bookmarks.includes('seiryofes.groups.favorite.' + id)
+      return this.storageBookmarks.includes('seiryofes.groups.favorite.' + id)
     },
 
     HashColor(text: string) {
