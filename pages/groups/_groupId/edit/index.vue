@@ -451,6 +451,116 @@
               </div>
             </v-card>
 
+            <!--何階かの情報の編集-->
+            <v-card class="mx-1 my-1 px-2 py-2" elevation="1">
+              <v-card-title class="ma-0 pa-0">
+                <p
+                  class="mx-0 my-1 pa-0 grey--text text--darken-2 text-subtitle-2"
+                >
+                  <v-icon color="light-blue" class="mr-2">mdi-stairs</v-icon>
+                  階
+                </p>
+                <v-spacer></v-spacer>
+                <a
+                  v-show="!change_floor_form"
+                  class="mx-0 my-2 pa-0 text-body-2"
+                  @click="change_floor_form = !change_floor_form"
+                  >編集</a
+                >
+                <a
+                  v-show="change_floor_form"
+                  class="mx-0 my-2 pa-0 text-body-2"
+                  @click="change_floor_form = !change_floor_form"
+                  >キャンセル</a
+                >
+              </v-card-title>
+              <v-card-text class="ma-0 pa-0">
+                <span class="mx-0 my-2 pa-0 text-body-1">{{
+                  group?.floor
+                }}</span>
+              </v-card-text>
+              <div v-show="change_floor_form">
+                <v-card-text class="mx-0 px-0 py-2">
+                  <v-text-field
+                    v-model="change_floor_input"
+                    label="階"
+                    counter
+                    maxlength="1"
+                    filled
+                    class="ma-0 pt-1 pb-0"
+                  >
+                  </v-text-field>
+                </v-card-text>
+                <v-card-actions class="ma-0 px-0 py-0">
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="primary"
+                    @click="
+                      group_edit.floor = change_floor_input
+                      updateGroup()
+                    "
+                  >
+                    適用
+                  </v-btn>
+                </v-card-actions>
+              </div>
+            </v-card>
+
+            <!--場所の編集-->
+            <v-card class="mx-1 my-1 px-2 py-2" elevation="1">
+              <v-card-title class="ma-0 pa-0">
+                <p
+                  class="mx-0 my-1 pa-0 grey--text text--darken-2 text-subtitle-2"
+                >
+                  <v-icon color="light-blue" class="mr-2">mdi-map</v-icon>
+                  場所
+                </p>
+                <v-spacer></v-spacer>
+                <a
+                  v-show="!change_place_form"
+                  class="mx-0 my-2 pa-0 text-body-2"
+                  @click="change_place_form = !change_place_form"
+                  >編集</a
+                >
+                <a
+                  v-show="change_place_form"
+                  class="mx-0 my-2 pa-0 text-body-2"
+                  @click="change_place_form = !change_place_form"
+                  >キャンセル</a
+                >
+              </v-card-title>
+              <v-card-text class="ma-0 pa-0">
+                <span class="mx-0 my-2 pa-0 text-body-1">{{
+                  group?.place
+                }}</span>
+              </v-card-text>
+              <div v-show="change_place_form">
+                <v-card-text class="mx-0 px-0 py-2">
+                  <v-text-field
+                    v-model="change_place_input"
+                    label="場所"
+                    counter
+                    maxlength="50"
+                    filled
+                    class="ma-0 pt-1 pb-0"
+                  >
+                  </v-text-field>
+                </v-card-text>
+                <v-card-actions class="ma-0 px-0 py-0">
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="primary"
+                    @click="
+                      group_edit.place = change_place_input
+                      updateGroup()
+                    "
+                  >
+                    適用
+                  </v-btn>
+                </v-card-actions>
+              </div>
+            </v-card>
+
             <v-card
               v-show="$auth.user?.groups?.includes(user_groups.admin)"
               class="mx-1 my-1 px-2 py-2"
@@ -746,6 +856,10 @@ type Data = {
   change_url_name_input: string
   change_thumbnail_image_form: boolean
   change_thumbnail_image_input: any
+  change_floor_form: boolean
+  change_floor_input: number
+  change_place_form: boolean
+  change_place_input: string
   change_tags_form: boolean
   tag_selector: Tag
   change_events_form: boolean
@@ -785,7 +899,7 @@ export default Vue.extend({
       events = res[2]
       links = res[3]
     }
-    const { id, enable_vote, groupname, ...group_edit } = group as Group
+    const group_edit = { ...(group as Group) }
     return {
       tags,
       group,
@@ -803,7 +917,10 @@ export default Vue.extend({
       events: [],
       links: [],
       tag_selector: { id: '', tagname: '' },
-      group_edit: {},
+      group_edit: {
+        floor: null,
+        place: null,
+      },
       user_groups: {
         admin: process.env.AZURE_AD_GROUPS_QUAINT_ADMIN as string,
         owner: process.env.AZURE_AD_GROUPS_QUAINT_OWNER as string,
@@ -829,6 +946,10 @@ export default Vue.extend({
       change_url_name_input: '',
       change_thumbnail_image_form: false,
       change_thumbnail_image_input: null,
+      change_floor_form: false,
+      change_floor_input: 0,
+      change_place_form: false,
+      change_place_input: '',
       change_tags_form: false,
       change_events_form: false,
       add_eventname: '例)第1公演',
