@@ -338,7 +338,7 @@ export default Vue.extend({
   },
 
   async created() {
-    // チケット情報関連の総取得
+    // まず、チケット情報関連を総取得する
     await this.getAllEventsData()
 
     // admin権限を持つ もしくは この団体にowner権限を持つユーザーがアクセスするとtrueになりページを編集できる
@@ -354,6 +354,8 @@ export default Vue.extend({
         })
       }
     }
+
+    // 「閲覧数」にまつわる処理
     this.$axios
       .$get(
         '/ga/screenpageview?start_date=7daysAgo&end_date=today&page_path=' +
@@ -373,11 +375,13 @@ export default Vue.extend({
       }
     }
 
-    // ロードページの終了
+    // ロードの終了
     this.nowloading = false
   },
 
   mounted() {
+    // ブックマークされているかチェック
+    // localStorageはmountedじゃないとアクセスできない
     for (let i = 0; i < localStorage.length; i++) {
       if (
         'seiryofes.groups.favorite.' + this.group?.id ===
@@ -391,14 +395,19 @@ export default Vue.extend({
   },
 
   methods: {
+    // addBookmark: localStorageにブックマークを追加するmethod
     addBookmark(id: string) {
       localStorage.setItem('seiryofes.groups.favorite.' + id, id)
       this.is_bookmarked = true
     },
+
+    // removeBookmark: localStorageから指定したブックマークを削除するmethod
     removeBookmark(id: string) {
       localStorage.removeItem('seiryofes.groups.favorite.' + id)
       this.is_bookmarked = false
     },
+
+    // isNotClassroom: クラス劇かどうかを判定し、オンライン整理券があるかどうか判定するmethod
     isNotClassroom(group: Group) {
       for (let i = 0; i < group.tags.length; i++) {
         if (
@@ -412,10 +421,9 @@ export default Vue.extend({
       return false
     },
 
-    //  未ログイン状態では全ての公演，ログインしている状態ではユーザ属性に合った公演のみが表示されるようにするmethod
+    // suitableEvents: 未ログイン状態では全ての公演，ログインしている状態ではユーザ属性に合った公演のみが表示されるようにするmethod
     suitableEvents() {
-      //  全ての公演（events）から，ログイン中のユーザ属性（e.g.students,parents）に合致する公演のみがfiltered_eventsに格納される
-      //  '&& this.IsToday(val.sell_starts, val.sell_ends, val.starts_at)'を付け加えれば，当日の整理券のみが表示されるようになる
+      //  全ての公演（events）から，ログイン中のユーザ属性（e.g. students,parents）に合致する公演のみがfiltered_eventsに格納される
       const filtered_events: Event[] = this.events.filter((val: Event) => {
         return this.$quaintUserRole(val.target, this.$auth.user)
       })
@@ -438,6 +446,7 @@ export default Vue.extend({
       }
     },
 
+    // hashColor: 団体のサムネがない時に単色を表示させるmethod
     hashColor(text: string) {
       // group.idを色数で割った余りでデフォルトの色を決定
       const colors = [
@@ -462,7 +471,7 @@ export default Vue.extend({
       return colors[index]
     },
 
-    // チケット情報の取得をまとめたもの
+    // getAllEventsData: チケット情報の取得を統括したmethod
     async getAllEventsData() {
       // イベント情報の取得
       this.events = await this.getEvents()
@@ -472,7 +481,7 @@ export default Vue.extend({
       this.list_taken_tickets = res.list_taken_tickets
     },
 
-    // Eventsを取得
+    // getEvents: event(公演)を取得するmethod
     async getEvents(): Promise<Event[]> {
       const res = await this.$axios
         .$get('/groups/' + this.$route.params.groupId + '/events')
@@ -494,9 +503,9 @@ export default Vue.extend({
       return res
     },
 
-    // 各チケットの取得
-    // list_stockの取得
-    // list_taken_ticketsの取得
+    // getTickets: 各公演の整理券配布状況を取得するmethod
+    // list_stock…席数
+    // list_taken_tickets…既に取られた整理券の数
     getTickets(events: Event[]) {
       if (events.length !== 0) {
         const get_tickets_info = []
